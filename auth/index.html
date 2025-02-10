@@ -1,92 +1,112 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" content="utf-8" />
     <meta charset="utf-8" />
-    <title>iSSJ CMC - Login</title>
+    <title>STHS Interact</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+    <script> if (top.location != self.location) top.location = self.location.href; </script>
+
     <link rel="stylesheet" href="/api/w3.css" />
-    <link rel="stylesheet" href="/api/sths-fonts.css" />
+    <link rel="stylesheet" href="https://assets.sbhs.net.au/css/shs/shs-fonts.css" />    
     <link rel="stylesheet" href="/api/sths-fa.css" />
-    <link rel="stylesheet" href="/api/sths-login.css" />
-    <link rel="icon" href="/api/favicon.ico">
-    <script src="/api/disable-inspect.js" defer></script>
-
-    <!-- Correctly link the auth.js file with defer to ensure it loads after the DOM -->
-    <script src="/api/auth.js" defer></script>
-
-    <style>
-        body {
-            font-family: 'Lato', sans-serif;
-            background-image: url('/api/login_background.jpg');
-            background-size: cover;
-            height: 100vh;
-            margin: 0;
-        }
-
-        #shs-login-title {
-            font-family: 'Lato', sans-serif;
-            font-weight: 900;
-        }
-
-        .error-message {
-            background-color: #e74c3c;
-            color: white;
-            padding: 16px;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-
-        .error-message p:first-child {
-            font-size: 1.45rem;
-            font-weight: 900;
-        }
-    </style>
+    <link rel="stylesheet" href="/api/sths-newlogin.css" />
+    <script src="/api/jquery.min.js"></script>    
+    <script src="https://login.sbhs.net.au/js/shs-login.js?fe2deddfdf7c48a0a3b36a5d31677153"></script>
+    
+    <script src="/login/auth.js" defer></script> <!-- Include the authentication script -->
 </head>
 <body>
-
+    <!-- header -->
     <div class="w3-top" id="shs-foot">
         <div class="w3-row w3-black">
+            <div class="w3-buttons">
+                <a href="https://sths-interact.tech" class="w3-bar-item w3-button w3-right "><i class="fa fa-home"></i></a>
+                <a href="https://sths-interact.tech/what's-this" class="w3-bar-item w3-button w3-right "><i class="fa fa-question-circle"></i></a>
+            </div>
             <div class="shs-logo-foot">
-                <p class="shs-foot-text">iSSJ Case Management Commission</p>
+                <p class="shs-foot-text">Sydney Technical High School - Interact</p>
             </div>
         </div>
     </div>
 
+    <!-- login container -->
     <div id="shs-login-container">
         <div class="w3-container" id="shs-login">
             <div class="w3-card-4">
+                <!-- login header -->
                 <header class="w3-container">
-                    <h2 id="shs-login-title">Account Log In</h2>              
+                    <h2 id="shs-login-title">Sign in</h2>  
+                    <p id="shs-login-instruction">to continue to STHS Interact</p>            
                 </header>
 
+                <!-- login content -->
                 <div class="w3-container">
-                    <p id="shs-login-instruction">Log in with InteractID &mdash;</p>
-                    <div id="shs-login-message"></div> <!-- Error message will appear here -->
+                    <div id="shs-login-message"></div> <!-- Error message here -->
 
                     <form id="shs-login-form">
-                        <section id="fld-username" class="shs-field w3-section">
-                            <input class="w3-input" type="text" placeholder="Username" name="username" id="fld-username-fld" autofocus="autofocus" />
+                        <section id="fld-username" class="shs-field w3-section">    
+                            <input class="w3-input" type="text" placeholder="User identifier" name="username" id="fld-username-fld" autofocus="autofocus" />
+                            <span class="bar"></span>
                         </section>
 
-                        <section id="fld-password" class="shs-field w3-section">
-                            <input class="w3-input" type="password" placeholder="Password" name="password" id="fld-password-fld" />
-                        </section>
-
-                        <section class="w3-section">
-                            <!-- Removed inline onclick, will handle it through JS -->
-                            <button type="button" id="login-button" class="w3-button w3-block w3-blue">Log In</button>
+                        <section class="w3-section w3-right">
+                            <input type="submit" value="Next" class="w3-button w3-block w3-blue" style="padding: 8px 32px; min-width: 120px" />
                         </section>
                     </form>
 
+                    <section class="w3-panel"></section>
+
                     <section class="w3-section" id="shs-login-links">                    
-                        <p><a href="/login-instructions">Can't access your account?</a></p>
+                        <p><a href="https://sbhs.co/login-instructions">Can't access your account?</a></p>
                     </section>
                 </div>
             </div>
         </div>
     </div>
 
+    <script>
+        // This script is responsible for handling the form submission and dynamic redirect URL.
+        document.getElementById('shs-login-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+    
+            const username = document.getElementById('fld-username-fld').value.trim(); // Get the entered username
+            let redirectURL = new URLSearchParams(window.location.search).get('redirect'); // Get redirect query parameter
+    
+            // Default to 'sths-interact.tech' if no redirect is provided
+            let defaultRedirect = "https://sths-interact.tech"; 
+    
+            // Check for a valid referrer, and if it's a known source, use it as the redirect URL
+            const validDomains = ["sths-interact.tech", "intranet.justice.sths-interact.tech"];
+            const referrer = document.referrer;
+    
+            // Check if the referrer exists and if it's from a valid domain
+            if (referrer) {
+                // If the referrer is from a valid domain, use it as the redirect URL
+                if (validDomains.some(domain => referrer.includes(domain))) {
+                    redirectURL = referrer;
+                } else {
+                    // If not from a valid domain, fallback to default redirect URL
+                    redirectURL = defaultRedirect;
+                }
+            } else {
+                // If there's no referrer, fallback to default redirect
+                redirectURL = defaultRedirect;
+            }
+    
+            // Validate the username field
+            if (!username) {
+                document.getElementById("shs-login-message").innerHTML = '<p style="color:red">Please enter a username.</p>';
+                return; // Stop execution if no username is provided
+            }
+    
+            // Build the final SSO login URL with the username and redirect parameters
+            const ssoLoginURL = `https://auth.sths-interact.tech/login/index.html?user=${encodeURIComponent(username)}&redirect=${encodeURIComponent(redirectURL)}`;
+    
+            // Redirect to the SSO login page
+            window.location.href = ssoLoginURL;
+        });
+    </script>
+    
 </body>
 </html>
