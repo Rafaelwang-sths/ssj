@@ -6,7 +6,6 @@
     <title>After SSO Validation</title>
     <link rel="stylesheet" href="https://www.w3.org/StyleSheets/Core/Swiss.css"> <!-- Basic Styling (Change if needed) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery (for easier DOM manipulation) -->
-    <script src="/login/auth.js" defer></script> <!-- Include the auth.js script here -->
 </head>
 <body>
     <div class="w3-container" style="padding-top: 50px;">
@@ -14,24 +13,35 @@
         <p id="status-message">Validating user...</p>
 
         <script>
-            // Ensure the validation process works
-            document.addEventListener("DOMContentLoaded", function() {
-                // Get the URL parameters
-                const urlParams = new URLSearchParams(window.location.search);
-                const username = urlParams.get('username');
-                const key = urlParams.get('key');
-                
-                // Check if the key exists in localStorage
-                if (localStorage.getItem(`${username}-${key}`)) {
-                    // Valid key found, redirect to the original destination
-                    let destination = urlParams.get('redirect') || 'https://sths-interact.tech'; // Default to homepage if not found
-                    window.location.href = destination;
+            // Hardcoded list of valid keys for users (first column)
+            const validKeys = [
+                'sample.user-ABC123XYZ789MNO456PQR012'  // Your specific key for validation
+            ];
+
+            // Get the URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const username = urlParams.get('username');
+            const key = urlParams.get('key');
+            const redirect = urlParams.get('redirect') || 'https://sths-interact.tech'; // Default redirect URL
+
+            // Function to validate the key
+            function validateKey(username, key, redirect) {
+                // Check if the provided key is valid
+                if (validKeys.includes(key)) {
+                    // Valid key found, redirect to the destination URL
+                    window.location.href = `${redirect}/after-sso.html`;  // Append /after-sso.html for the final redirection
                 } else {
-                    // Invalid or missing key, show error message
+                    // Invalid or missing key, show error message and optionally redirect
                     document.getElementById("status-message").innerHTML = "Invalid or missing key. Please log in again.";
-                    // Optionally, you could redirect them back to the login page
-                    // setTimeout(() => window.location.href = '/login/index.html', 3000); // Redirect after 3 seconds (optional)
+                    
+                    // Optionally, redirect the user after a delay
+                    setTimeout(() => window.location.href = '/login/index.html', 3000); // Redirect after 3 seconds (optional)
                 }
+            }
+
+            // Call the validation function
+            document.addEventListener("DOMContentLoaded", function() {
+                validateKey(username, key, redirect);
             });
         </script>
     </div>
