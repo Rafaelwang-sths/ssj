@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>After SSO Validation</title>
+    <link rel="stylesheet" href="https://www.w3.org/StyleSheets/Core/Swiss.css"> <!-- Basic Styling (Change if needed) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery (for easier DOM manipulation) -->
+    <script src="/login/auth.js" defer></script> <!-- Include the auth.js script here -->
+</head>
+<body>
+    <div class="w3-container" style="padding-top: 50px;">
+        <h2>SSO Authentication</h2>
+        <p id="status-message">Validating user...</p>
+
+        <script>
+            // Ensure the validation process works
+            document.addEventListener("DOMContentLoaded", function() {
+                // Get the URL parameters
+                const urlParams = new URLSearchParams(window.location.search);
+                const username = urlParams.get('username');
+                const key = urlParams.get('key');
+                
+                // Check if the key exists in localStorage
+                if (localStorage.getItem(`${username}-${key}`)) {
+                    // Valid key found, redirect to the original destination
+                    let destination = urlParams.get('redirect') || 'https://sths-interact.tech'; // Default to homepage if not found
+                    window.location.href = destination;
+                } else {
+                    // Invalid or missing key, show error message
+                    document.getElementById("status-message").innerHTML = "Invalid or missing key. Please log in again.";
+                    // Optionally, you could redirect them back to the login page
+                    // setTimeout(() => window.location.href = '/login/index.html', 3000); // Redirect after 3 seconds (optional)
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>
